@@ -10,6 +10,8 @@ public class GameManager : MonoBehaviour
     // The level which the enemies appear.
     private int level = 3;
     // Start is called before the first frame update
+    public int playerFoodPoints = 100;
+    [HideInInspector] public bool playersTurn = true;
     void Awake()
     {
         if (instance == null)
@@ -29,6 +31,11 @@ public class GameManager : MonoBehaviour
     void InitGame()
     {
         boardScript.SetupScene(level);
+    }
+
+    public void GameOver()
+    {
+        enabled = false;
     }
 
     // Update is called once per frame
