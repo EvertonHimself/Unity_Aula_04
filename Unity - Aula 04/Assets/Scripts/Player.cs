@@ -58,22 +58,22 @@ public class Player : MovingObject
         GameManager.instance.playersTurn = false;
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        if (collision.tag == "Exit")
+        if (other.tag == "Exit")
         {
             Invoke("Restart", restartLevelDelay);
             enabled = false;
         }
-        else if (collision.tag == "Food")
+        else if (other.tag == "Food")
         {
             food += pointsPerFood;
-            collision.gameObject.SetActive(false);
+            other.gameObject.SetActive(false);
         }
-        else if (collision.tag == "Soda")
+        else if (other.tag == "Soda")
         {
             food += pointsPerSoda;
-            collision.gameObject.SetActive(false);
+            other.gameObject.SetActive(false);
         }
     }
 
@@ -84,7 +84,6 @@ public class Player : MovingObject
         animator.SetTrigger("playerChop");
     }
 
-    [System.Obsolete]
     private void Restart()
     {
         Application.LoadLevel(Application.loadedLevel);
