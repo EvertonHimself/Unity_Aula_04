@@ -4,14 +4,20 @@ using UnityEngine;
 
 public class GameManager2 : MonoBehaviour
 {
+    // Mostrar esse depois que criar a variável boardScript.
+    // Publico para que seja acessível no Inspector (e outros scripts).
+    // Static pois a variável irá pertencer a classe.
     public static GameManager2 instance = null;
 
     public BoardManager2 boardScript;
-    // Vamos começar testando com o level 3, pois é quando os inimigos surgem.
-    private int level = 9;
+    
+    // Vamos começar testando com o level 3 (ou 9), pois é quando os inimigos surgem.
+    private int level = 3;
 
+    // Awake é uma função da Unity que é executada antes do Start.
     private void Awake()
     {
+        // Checa se instance e está vazia, e se estiver atribui a ela a própria instância do GameManager.
         if (instance == null)
         {
             instance = this;
@@ -21,8 +27,10 @@ public class GameManager2 : MonoBehaviour
             Destroy(gameObject);
         }
 
+        // Não destrói o game object ao carregar uma cena.
         DontDestroyOnLoad(gameObject);
 
+        // Referência ao componente Board Manager.
         boardScript = GetComponent<BoardManager2>();
         InitGame();
     }
@@ -32,5 +40,5 @@ public class GameManager2 : MonoBehaviour
     {
         boardScript.SetupScene(level);
     }
-    // Depois de fazer as alterações acima, volte ao editor para fazer as atribuições dos objetos.
+    // Depois de fazer as alterações acima, volte ao editor para fazer as atribuições dos objetos (se ainda não tiver feito).
 }
