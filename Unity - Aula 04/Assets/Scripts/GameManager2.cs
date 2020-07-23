@@ -11,7 +11,8 @@ public class GameManager2 : MonoBehaviour
 
     public BoardManager2 boardScript;
 
-    // Criar a variável playerFoodPoints depois de tudo mas antes de criar o Player Script.
+    // Criar a variável playerFoodPoints e playersTurn depois de tudo mas antes de criar o Player Script.
+    // Criar também a função "Game Over".
     public int playerFoodPoints = 100;
     [HideInInspector] public bool playersTurn = true;
     
@@ -46,6 +47,7 @@ public class GameManager2 : MonoBehaviour
     }
     // Depois de fazer as alterações acima, volte ao editor para fazer as atribuições dos objetos (se ainda não tiver feito).
 
+    // Criar antes de criar o script do Player.
     public void GameOver()
     {
         enabled = false;
