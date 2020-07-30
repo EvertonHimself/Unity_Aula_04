@@ -43,6 +43,8 @@ public class Player3 : MovingObject3
             return; // Cancela a execução do método.
         }
 
+        Debug.Log("Updating...");
+
         // Guarda a direção para qual o jogador está tentando se mover.
         int horizontal = 0;
         int vertical = 0;
