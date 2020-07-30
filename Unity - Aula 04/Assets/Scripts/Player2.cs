@@ -65,8 +65,8 @@ public class Player2 : MovingObject2
         int vertical = 0;
         
 
-        horizontal = (int)Input.GetAxisRaw("Horizontal");
-        vertical = (int)Input.GetAxisRaw("Vertical");
+        horizontal = (int)(Input.GetAxisRaw("Horizontal"));
+        vertical = (int)(Input.GetAxisRaw("Vertical"));
 
         // Impede o player de se mover na diagonal.
         if (horizontal != 0)
@@ -75,7 +75,7 @@ public class Player2 : MovingObject2
         }
 
         // Se horizontal ou vertical for diferente de zero, significa que está tentando se mover.
-        if (horizontal != 0 || vertical == 0)
+        if (horizontal != 0 || vertical != 0)
         {
             // Testa se o player vai encontrar uma parede. Esperamos que ele encontre uma parede.
             // Parâmetros: a direção para a qual o player está tentando ir.
@@ -88,7 +88,7 @@ public class Player2 : MovingObject2
     protected override void OnCantMove<T>(T component)
     {
         // No caso do player, queremos que ele faça algo se for bloqueado por uma parede.
-        Wall hitWall = component as Wall;
+        Wall2 hitWall = component as Wall2;
         hitWall.DamageWall(wallDamage);
         animator.SetTrigger("playerChop");
     }
