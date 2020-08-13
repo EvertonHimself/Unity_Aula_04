@@ -12,6 +12,11 @@ public class Wall2 : MonoBehaviour
     // O componente SpriteRenderer da parede.
     private SpriteRenderer spriteRenderer;
 
+    // Os sons de destruição das paredes.
+    public AudioClip chopSound1;
+    public AudioClip chopSound2;
+    // Vá para DamageWall.
+
     private void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -19,6 +24,8 @@ public class Wall2 : MonoBehaviour
 
     public void DamageWall(int loss)
     {
+        // Randomiza os efeitos sonoros.
+        SoundManager.instance.RandomizeSfx(chopSound1, chopSound2);
         spriteRenderer.sprite = dmgSprite;
         hp -= loss;
         if (hp <= 0 )

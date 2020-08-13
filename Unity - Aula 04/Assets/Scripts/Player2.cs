@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Player2 : MovingObject2
 {
@@ -13,11 +14,26 @@ public class Player2 : MovingObject2
     // Guarda a quantidade de comida durante o level, antes de passar para o GameManager ao trocar de level.
     private int food;
 
+    // UI
+    public Text foodText;
+
+    // Clipes de áudio.
+    public AudioClip moveSound1;
+    public AudioClip moveSound2;
+    public AudioClip eatSound1;
+    public AudioClip eatSound2;
+    public AudioClip drinkSound1;
+    public AudioClip drinkSound2;
+    public AudioClip GameOverSound;
+    // Vá para AttemptMove.
+
     protected override void Start()
     {
         animator = GetComponent<Animator>();
         // Pega a comida que foi salva no game manager.
         food = GameManager2.instance.playerFoodPoints;
+
+        foodText.text = "Food: " + food; // Vá para AttemptMove.
 
         base.Start();
     }
@@ -32,6 +48,8 @@ public class Player2 : MovingObject2
     {
         if (food <= 0)
         {
+            SoundManager.instance.PlaySingle(GameOverSound);
+            SoundManager.instance.musicSource.Stop();
             GameManager2.instance.GameOver();
         }
     }
@@ -42,10 +60,21 @@ public class Player2 : MovingObject2
     {
         // Perde 1 de comida a cada movimento.
         food--;
+
+        // Atualiza o texto da comida.
+        foodText.text = "Food: " + food; // Vá para OnTriggerEnter2D.
+
         // Executa a função AttemptMove() da classe base.
         base.AttemptMove<T>(xDir, yDir);
         // Permite referenciar o resultado do Linecast feito em Move().
         RaycastHit2D hit;
+
+        // Toca o clipe de áudio no momento apropriado.
+        if (Move (xDir, yDir, out hit))
+        {
+            SoundManager.instance.RandomizeSfx(moveSound1, moveSound2); // Vá para OnTrigger...
+        }
+
         // Checa se deu game over, pois o jogador perde comida ao se mover.
         CheckIfGameOver();
         // Fim do turno do player.
@@ -105,6 +134,8 @@ public class Player2 : MovingObject2
     {
         animator.SetTrigger("playerHit");
         food -= loss;
+        // Exibe a comida que o jogador perdeu.
+        foodText.text = "-" + loss + " Food " + food;
         CheckIfGameOver();
     }
 
@@ -120,11 +151,19 @@ public class Player2 : MovingObject2
         else if (other.tag == "Food")
         {
             food += pointsPerFood;
+            // Exibe a comida que o jogador pegou.
+            foodText.text = "+" + pointsPerFood + " Food " + food;
+            // Toca o áudio da comida.
+            SoundManager.instance.RandomizeSfx(eatSound1, eatSound2);
             other.gameObject.SetActive(false);
         }
         else if (other.tag == "Soda")
         {
             food += pointsPerSoda;
+            // Exibe a comida que o jogador pegou.
+            foodText.text = "+" + pointsPerSoda + " Food " + food; // Configure também o Lose Food.
+            // Toca o áudio da Soda.
+            SoundManager.instance.RandomizeSfx(drinkSound1, drinkSound2); // Vá para CheckIfGameOver.
             other.gameObject.SetActive(false);
         }
     }

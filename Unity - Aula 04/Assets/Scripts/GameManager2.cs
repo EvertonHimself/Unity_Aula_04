@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+// Namespace da UI
+using UnityEngine.UI;
 
 public class GameManager2 : MonoBehaviour
 {
@@ -24,7 +26,25 @@ public class GameManager2 : MonoBehaviour
     [HideInInspector] public bool playersTurn = true;
     
     // Vamos começar testando com o level 3 (ou 9), pois é quando os inimigos surgem.
-    private int level = 3;
+    private int level = 1;
+
+    /* Configurações da UI */
+    // Tempo antes de iniciar o Level.
+    public float levelStartDelay = 2f;
+    // Texto do level.
+    private Text levelText;
+    // Imagem do level (a imagem preta).
+    private GameObject levelImage;
+    // Prevenir que o player se mova antes de iniciar o jogo.
+    private bool doingSetup;
+
+    // Evento lançado quando um level é carregado.
+    private void OnLevelWasLoaded(int index)
+    {
+        level++;
+        Debug.Log(level);
+        InitGame(); // Depois de fazer essa parte, colocar o doingSetup = true no InitGame().
+    }
 
     // Awake é uma função da Unity que é executada antes do Start.
     private void Awake()
@@ -53,15 +73,33 @@ public class GameManager2 : MonoBehaviour
     // Inicializa o jogo, chamando a função SetupScene().
     void InitGame()
     {
+        doingSetup = true;
+        levelImage = GameObject.Find("LevelImage");
+        levelText = GameObject.Find("LevelText").GetComponent<Text>();
+        levelText.text = "Day " + level;
+        levelImage.SetActive(true); // Depois disso, criar a função HideLevelImage()
+        Invoke("HideLevelImage", levelStartDelay); // Invoke chama uma funções depois de um determinado tempo em segundos.
+        // Vá para o update configurar o doingSetup.
+
         // Limpa a lista de inimigos ao carregar uma fase (fazer depois da animação do inimigo).
         enemies.Clear();
         boardScript.SetupScene(level);
     }
     // Depois de fazer as alterações acima, volte ao editor para fazer as atribuições dos objetos (se ainda não tiver feito).
 
+    
+    private void HideLevelImage()
+    {
+        levelImage.SetActive(false);
+        doingSetup = false;
+    }
+        
     // Criar antes de criar o script do Player.
     public void GameOver()
     {
+        // Mostra quantos dias o jogador sobreviveu e liga a tela preta.
+        levelText.text = "After " + level + " you starved.";
+        levelImage.SetActive(true);
         enabled = false;
     }
 
@@ -89,7 +127,7 @@ public class GameManager2 : MonoBehaviour
     // (fazer depois da animação do inimigo).
     private void Update()
     {
-        if (playersTurn || enemiesMoving)
+        if (playersTurn || enemiesMoving || doingSetup) // Vai impedir o movimento se estiver fazendo o setup. Configure o GameOver.
         {
             return;
         }

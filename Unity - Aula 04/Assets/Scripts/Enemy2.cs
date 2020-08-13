@@ -15,6 +15,11 @@ public class Enemy2 : MovingObject2
     // Faz o inimigo se mover em turnos alternados.
     private bool skipMove;
 
+    // Áudios do inimigo.
+    public AudioClip enemyAttack1;
+    public AudioClip enemyAttack2;
+    // Vá para OnCantMove.
+
     protected override void Start()
     {
         // Fazer isso depois das adições no GameManager.
@@ -64,6 +69,10 @@ public class Enemy2 : MovingObject2
         // Fazer isso depois das alterações do GameManager2.
         // Ativa a animação do personagem.
         animator.SetTrigger("enemyAttack");
+
+        // Randomiza os sons do inimigo.
+        SoundManager.instance.RandomizeSfx(enemyAttack1, enemyAttack2);
+
         hitPlayer.LoseFood(playerDamage);
     }
 }
