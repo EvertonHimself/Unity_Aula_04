@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices.ComTypes;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Player3 : MovingObject3
 {
@@ -14,10 +15,16 @@ public class Player3 : MovingObject3
     private Animator animator; // O Animator do Player.
     private int food; // Guarda a quantidade total de comida que o player coletou.
 
+    // Referência ao texto "Comida".
+    public Text foodText;
+
     protected override void Start()
     {
         animator = GetComponent<Animator>(); // Aponta para o Animator contido no Player.
         food = GameManager3.instance.playerFoodPoints; // A quantidade de comida que ficou salva no GameManager.
+
+        // Atualiza o texto da Comida na tela.
+        foodText.text = "Comida: " + food;
 
         base.Start();
     }
@@ -30,6 +37,10 @@ public class Player3 : MovingObject3
     protected override void AttemptMove<T>(int xDir, int yDir)
     {
         food--; // A mesma coisa que food = food - 1 ou food -= 1.
+
+        // Atualiza o texto Comida sempre que o jogador se move.
+        foodText.text = "Comida: " + food;
+
         base.AttemptMove<T>(xDir, yDir); // Executa AttemptMove da classe base.
         RaycastHit2D hit; // O objeto que foi encontrado no caminho do Player será guardado em hit.
         CheckIfGameOver();
@@ -84,6 +95,7 @@ public class Player3 : MovingObject3
     {
         animator.SetTrigger("playerHit");
         food -= loss;
+        foodText.text = "-" + loss + " Comida: " + food;
         CheckIfGameOver();
     }
 
@@ -105,11 +117,13 @@ public class Player3 : MovingObject3
         else if (other.tag == "Food")
         {
             food += pointsPerFood;
+            foodText.text = "+" + pointsPerFood + " Comida: " + food;
             other.gameObject.SetActive(false); // Desabilita a comida ao colidir com ela.
         }
         else if (other.tag == "Soda")
         {
             food += pointsPerSoda;
+            foodText.text = "+" + pointsPerSoda + " Comida: " + food;
             other.gameObject.SetActive(false);
         }
     }

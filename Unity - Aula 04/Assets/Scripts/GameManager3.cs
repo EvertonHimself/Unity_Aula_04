@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager3 : MonoBehaviour
 {
@@ -8,7 +10,7 @@ public class GameManager3 : MonoBehaviour
 
     public BoardManager3 boardManager;
 
-    private int level = 9;
+    private int level = 1;
 
     public int playerFoodPoints = 100;
     // [HideInInspector] Esconde a variável no Inspector.
@@ -21,8 +23,26 @@ public class GameManager3 : MonoBehaviour
     // Verdadeiro se os inimigos estão se movendo.
     private bool enemiesMoving;
 
+    /* Referências aos GameObjects da UI. */
+    // Tempo antes de iniciar o jogo
+    public float levelStartDelay = 2f;
+    // Texto do level.
+    private Text levelText;
+    // Imagem de background preta.
+    private GameObject levelImage;
+    // Impede o personagem de se mover enquanto é exibida a tela "Dia X".
+    private bool doingSetup;
+
+    private void OnLevelWasLoaded(int index)
+    {
+        level++;
+        Debug.Log(level);
+        InitGame();
+    }
+
     private void Awake()
     {
+        // Singleton pattern (padrão singleton).
         if (instance == null)
         {
             instance = this;
@@ -41,10 +61,24 @@ public class GameManager3 : MonoBehaviour
         InitGame();
     }
 
+    // Inicializa o jogo (limpa a lista de inimigos e gera a fase).
     void InitGame()
     {
+        doingSetup = true;
+        levelImage = GameObject.Find("LevelImage");
+        levelText = GameObject.Find("LevelText").GetComponent<Text>();
+        levelText.text = "Dia " + level;
+        levelImage.SetActive(true);
+        Invoke("HideLevelImage", levelStartDelay);
+
         enemies.Clear();
         boardManager.SetupScene(level);
+    }
+
+    private void HideLevelImage()
+    {
+        levelImage.SetActive(false);
+        doingSetup = false;
     }
 
     // Move os inimigos, um de cada vez em sequência.
@@ -70,7 +104,7 @@ public class GameManager3 : MonoBehaviour
 
     private void Update()
     {
-        if (playersTurn == true || enemiesMoving == true)
+        if (playersTurn == true || enemiesMoving == true || doingSetup == true)
         {
             return;
         }
@@ -87,6 +121,10 @@ public class GameManager3 : MonoBehaviour
     // Desabilita o game object.
     public void GameOver()
     {
+        // Mostra quantos dias o jogador durou.
+        levelText.text = "Depois de " + level + " dias você morreu.";
+        levelImage.SetActive(true);
+
         enabled = false;
     }
 }

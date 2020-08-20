@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Boo.Lang.Environments;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -26,6 +27,10 @@ public class Player2 : MovingObject2
     public AudioClip drinkSound2;
     public AudioClip GameOverSound;
     // Vá para AttemptMove.
+
+    // Touch Controls
+    // Onde o jogador começou a deslizar o dedo na tela. Está setado para uma posição fora da tela.
+    private Vector2 touchOrigin = -Vector2.one;
 
     protected override void Start()
     {
@@ -92,7 +97,9 @@ public class Player2 : MovingObject2
         // Guarda a direção do movimento (1 ou -1).
         int horizontal = 0;
         int vertical = 0;
-        
+
+        // Verifica para qual plataforma estamos compilando.
+#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBPLAYER
 
         horizontal = (int)(Input.GetAxisRaw("Horizontal"));
         vertical = (int)(Input.GetAxisRaw("Vertical"));
@@ -102,6 +109,36 @@ public class Player2 : MovingObject2
         {
             vertical = 0;
         }
+
+#else
+        // Controles touch.
+        if (Input.touchCount > 0)
+        {
+            Touch myTouch = Input.touches[0];
+            if (myTouch.phase == TouchPhase.Began)
+            {
+                touchOrigin = myTouch.position;
+            }
+
+            else if (myTouch.phase == TouchPhase.Ended && touchOrigin.x >= 0)
+            {
+                Vector2 touchEnd = myTouch.position;
+                float x = touchEnd.x - touchOrigin.x;
+                float y = touchEnd.y - touchOrigin.y;
+                touchOrigin.x = -1;
+
+                if (Mathf.Abs(x) > Mathf.Abs(y))
+                {
+                    horizontal = x > 0 ? 1 : -1;
+                }
+                else
+                {
+                    vertical = y > 0 ? 1 : -1;
+                }
+            }
+        }
+#endif
+
 
         // Se horizontal ou vertical for diferente de zero, significa que está tentando se mover.
         if (horizontal != 0 || vertical != 0)
