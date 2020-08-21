@@ -15,6 +15,10 @@ public class Enemy3 : MovingObject3
     // Faz o inimigo alternar turnos.
     private bool skipMove;
 
+    // Áudios do inimigo.
+    public AudioClip enemyAttack1;
+    public AudioClip enemyAttack2;
+
     // Sobrescreve o método "Start()" da classe pai.
     protected override void Start()
     {
@@ -60,6 +64,9 @@ public class Enemy3 : MovingObject3
     {
         Player3 hitPlayer = component as Player3;
         animator.SetTrigger("enemyAttack");
+
+        SoundManager2.instance.RandomSfx(enemyAttack1, enemyAttack2);
+
         hitPlayer.LoseFood(playerDamage);
     }
 }

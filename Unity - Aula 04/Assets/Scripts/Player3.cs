@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices.ComTypes;
 using UnityEngine;
@@ -17,6 +18,18 @@ public class Player3 : MovingObject3
 
     // Referência ao texto "Comida".
     public Text foodText;
+
+    // Efeitos sonoros.
+    public AudioClip moveSound1;
+    public AudioClip moveSound2;
+    public AudioClip eatSound1;
+    public AudioClip eatSound2;
+    public AudioClip drinkSound1;
+    public AudioClip drinkSound2;
+    public AudioClip gameOverSound;
+
+    // Onde o jogador começou a deslizar o dedo na tela.
+    private Vector2 touchOrigin = -Vector2.one;
 
     protected override void Start()
     {
@@ -43,6 +56,12 @@ public class Player3 : MovingObject3
 
         base.AttemptMove<T>(xDir, yDir); // Executa AttemptMove da classe base.
         RaycastHit2D hit; // O objeto que foi encontrado no caminho do Player será guardado em hit.
+
+        if (Move (xDir, yDir, out hit))
+        {
+            SoundManager2.instance.RandomSfx(moveSound1, moveSound2) ;
+        }
+
         CheckIfGameOver();
         GameManager3.instance.playersTurn = false; // Informa ao GameManager que acabou o turno do jogador.
     }
@@ -60,6 +79,7 @@ public class Player3 : MovingObject3
         int horizontal = 0;
         int vertical = 0;
 
+#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBPLAYER
         horizontal = (int)Input.GetAxisRaw("Horizontal");
         vertical = (int)Input.GetAxisRaw("Vertical");
 
@@ -68,6 +88,35 @@ public class Player3 : MovingObject3
         {
             vertical = 0;
         }
+#else
+        if (Input.touchCount > 0)
+	    {
+            Touch myTouch = Input.touches[0];
+        
+            if (myTouch.phase == TouchPhase.Began) 
+            {
+                touchOrigin = myTouch.position;
+            }
+
+            else if (myTouch.phase == TouchPhase.Ended && touchOrigin.x >= 0)
+            {
+                Vector2 touchEnd = myTouch.position;
+                float x = touchEnd.x - touchOrigin.x;
+                float y = touchEnd.y - touchOrigin.y;
+                touchOrigin.x = -1;
+
+                if (Mathf.Abs(x) > Math.Abs(y))
+                {
+                    horizontal = x > 0 ? 1 : -1; // operador ternário.
+                }
+                else
+                {
+                    vertical = y > 0 ? 1 : -1;
+                }
+            }
+	    }
+#endif
+
 
         if (horizontal != 0 || vertical != 0)
         {
@@ -103,6 +152,8 @@ public class Player3 : MovingObject3
     {
         if (food <= 0)
         {
+            SoundManager2.instance.PlaySingle(gameOverSound);
+            SoundManager2.instance.musicSource.Stop(); // Para a música.
             GameManager3.instance.GameOver();
         }
     }
@@ -118,12 +169,14 @@ public class Player3 : MovingObject3
         {
             food += pointsPerFood;
             foodText.text = "+" + pointsPerFood + " Comida: " + food;
+            SoundManager2.instance.RandomSfx(eatSound1, eatSound2);
             other.gameObject.SetActive(false); // Desabilita a comida ao colidir com ela.
         }
         else if (other.tag == "Soda")
         {
             food += pointsPerSoda;
             foodText.text = "+" + pointsPerSoda + " Comida: " + food;
+            SoundManager2.instance.RandomSfx(drinkSound1, drinkSound2);
             other.gameObject.SetActive(false);
         }
     }
